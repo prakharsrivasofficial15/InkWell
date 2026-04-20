@@ -1,0 +1,80 @@
+## Standard .NET .gitignore content first (from dotnet new gitignore)
+## Then add InkWell-specific entries:
+
+# ============================================
+# InkWell Project Specific
+# ============================================
+
+# Azure Key Vault (local development secrets)
+**/secrets.json
+*.pfx
+*.pem
+
+# Angular / Frontend
+**/ClientApp/node_modules/
+**/ClientApp/dist/
+**/ClientApp/.angular/
+**/package-lock.json
+**/npm-debug.log
+
+# Azure Storage Emulator
+__blobstorage__
+__queuestorage__
+**/Azurite/
+
+# Entity Framework Migrations (sometimes kept in source control)
+# **/Migrations/*.Designer.cs
+# !**/Migrations/
+
+# App Settings with secrets
+**/appsettings.*.json
+!**/appsettings.json
+!**/appsettings.Development.json
+!**/appsettings.Production.json
+
+# Docker
+**/Dockerfile
+**/.dockerignore
+*.tar.gz
+
+# Azure DevOps / GitHub Actions
+**/.github/workflows/*.local.yml
+
+# Test Results
+**/TestResults/
+**/coverage/
+**/.sonarqube/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Visual Studio Code
+.vscode/
+**/.history/
+
+# Mac OS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.directory
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.log
+
+# ============================================
+# Security Sensitive (NEVER COMMIT)
+# ============================================
+**/connectionstrings.config
+**/*.secret
+**/secrets.*.json
+**/azureauth.json
+**/.env
+**/*.crt
+**/*.key
