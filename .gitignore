@@ -77,4 +77,5 @@ __queuestorage__
 **/azureauth.json
 **/.env
 **/*.crt
-**/*.key
+**/*.keybin/ 
+obj/ 
