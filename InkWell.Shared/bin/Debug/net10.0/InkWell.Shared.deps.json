@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "InkWell.Shared/1.0.0": {
+        "runtime": {
+          "InkWell.Shared.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "InkWell.Shared/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
