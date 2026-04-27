@@ -28,6 +28,13 @@ builder.Services.AddApplicationInsightsTelemetry(options =>
 //EF Core → Azure SQL
 builder.Services.AddDbContext<PostDbContext>(opts =>
     opts.UseSqlServer(builder.Configuration["inkwell-sql-connection"]));
+// builder.Services.AddDbContext<PostDbContext>(opts =>
+//     opts.UseSqlServer(
+//         builder.Configuration["inkwell-sql-connection"],
+//         sqlOptions => sqlOptions.EnableRetryOnFailure(
+//             maxRetryCount: 3,
+//             maxRetryDelay: TimeSpan.FromSeconds(10),
+//             errorNumbersToAdd: null)));
 
 //Azure Redis Cache
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
