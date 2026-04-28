@@ -2,4 +2,5 @@
   <Project Path="InkWellCategory.API/InkWellCategory.API.csproj" />
   <Project Path="InkWellComment.API/InkWellComment.API.csproj" />
   <Project Path="InkWellMedia.API/InkWellMedia.API.csproj" />
+  <Project Path="InkWellNewsletter.API/InkWellNewsletter.API.csproj" />
 </Solution>
