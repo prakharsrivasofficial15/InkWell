@@ -17,9 +17,9 @@ public class NewsletterController : ControllerBase
     public NewsletterController(INewsletterService newsletterService) =>
         _newsletterService = newsletterService;
 
-    // ── Public Endpoints ──────────────────────────────────────────────────────
+    // Public Endpoints
 
-    /// <summary>Subscribe to newsletter. Triggers double opt-in email.</summary>
+    // Subscribe to newsletter. Triggers double opt-in email.
     [HttpPost("subscribe")]
     [ProducesResponseType(typeof(ApiResponse<SubscriberResponse>), 200)]
     [ProducesResponseType(typeof(ApiResponse<object>), 400)]
@@ -39,7 +39,7 @@ public class NewsletterController : ControllerBase
         }
     }
 
-    /// <summary>Confirm subscription via token link from email.</summary>
+    // Confirm subscription via token link from email.
     [HttpGet("confirm")]
     [ProducesResponseType(typeof(ApiResponse<object>), 200)]
     [ProducesResponseType(typeof(ApiResponse<object>), 400)]
@@ -61,7 +61,7 @@ public class NewsletterController : ControllerBase
         }
     }
 
-    /// <summary>One-click unsubscribe via token link from email.</summary>
+    // One-click unsubscribe via token link from email.
     [HttpGet("unsubscribe")]
     [ProducesResponseType(typeof(ApiResponse<object>), 200)]
     public async Task<IActionResult> Unsubscribe([FromQuery] string token)
@@ -78,7 +78,7 @@ public class NewsletterController : ControllerBase
         }
     }
 
-    /// <summary>Update subscription preferences.</summary>
+    // Update subscription preferences.
     [HttpPut("{subscriberId}/preferences")]
     [Authorize]
     [ProducesResponseType(typeof(ApiResponse<object>), 200)]
@@ -96,9 +96,9 @@ public class NewsletterController : ControllerBase
         }
     }
 
-    // ── Admin Endpoints ───────────────────────────────────────────────────────
+    // Admin Endpoints
 
-    /// <summary>Get all subscribers. Admin only.</summary>
+    // Get all subscribers (Admin only)
     [HttpGet("subscribers")]
     [Authorize(Roles = "ADMIN")]
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<SubscriberResponse>>), 200)]
@@ -109,7 +109,7 @@ public class NewsletterController : ControllerBase
             true, "Subscribers fetched.", subscribers));
     }
 
-    /// <summary>Get subscriber count breakdown. Admin only.</summary>
+    // Get subscriber count breakdown (Admin only)
     [HttpGet("subscribers/count")]
     [Authorize(Roles = "ADMIN")]
     [ProducesResponseType(typeof(ApiResponse<SubscriberCountResponse>), 200)]
@@ -120,7 +120,7 @@ public class NewsletterController : ControllerBase
             true, "Count fetched.", count));
     }
 
-    /// <summary>Send a newsletter campaign. Admin only.</summary>
+    // Send a newsletter campaign (Admin only)
     [HttpPost("send")]
     [Authorize(Roles = "ADMIN")]
     [ProducesResponseType(typeof(ApiResponse<CampaignResponse>), 200)]
@@ -139,7 +139,7 @@ public class NewsletterController : ControllerBase
         }
     }
 
-    // ── Helper ────────────────────────────────────────────────────────────────
+    // Helper
 
     private Guid GetCurrentUserId()
     {

@@ -95,4 +95,22 @@ public class PostRepository : IPostRepository
         _db.PostLikes.Remove(like);
         await _db.SaveChangesAsync();
     }
+
+    public async Task IncrementLikesCountAsync(Guid postId)
+    {
+        await _db.Posts
+            .Where(p => p.PostId == postId)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(p => p.LikesCount, p => p.LikesCount + 1)
+                .SetProperty(p => p.UpdatedAt, DateTime.UtcNow));
+    }
+
+    public async Task DecrementLikesCountAsync(Guid postId)
+    {
+        await _db.Posts
+            .Where(p => p.PostId == postId && p.LikesCount > 0)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(p => p.LikesCount, p => p.LikesCount - 1)
+                .SetProperty(p => p.UpdatedAt, DateTime.UtcNow));
+    }
 }

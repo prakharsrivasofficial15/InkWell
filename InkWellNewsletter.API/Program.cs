@@ -15,7 +15,7 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── 1. Azure Key Vault ────────────────────────────────────────────────────────
+// Azure Key Vault
 var keyVaultUri = builder.Configuration["KeyVaultUri"]
     ?? throw new InvalidOperationException("KeyVaultUri not configured.");
 
@@ -23,11 +23,11 @@ builder.Configuration.AddAzureKeyVault(
     new Uri(keyVaultUri),
     new DefaultAzureCredential());
 
-// ── 2. Azure Application Insights ─────────────────────────────────────────────
+// Azure Application Insights
 builder.Services.AddApplicationInsightsTelemetry(options =>
     options.ConnectionString = builder.Configuration["inkwell-appinsights-connection"]);
 
-// ── 3. EF Core → Azure SQL ─────────────────────────────────────────────────────
+// EF Core → Azure SQL
 builder.Services.AddDbContext<NewsletterDbContext>(opts =>
     opts.UseSqlServer(
         builder.Configuration["inkwell-sql-connection"],
@@ -36,11 +36,11 @@ builder.Services.AddDbContext<NewsletterDbContext>(opts =>
             maxRetryDelay: TimeSpan.FromSeconds(10),
             errorNumbersToAdd: null)));
 
-// ── 4. Azure Communication Services Email ──────────────────────────────────────
+// Azure Communication Services Email
 builder.Services.AddSingleton(_ =>
     new EmailClient(builder.Configuration["inkwell-acs-connection"]));
 
-// ── 5. Azure Service Bus ───────────────────────────────────────────────────────
+// Azure Service Bus
 var serviceBusConnection = builder.Configuration["inkwell-servicebus-connection"];
 if (string.IsNullOrEmpty(serviceBusConnection))
 {
@@ -51,7 +51,7 @@ Console.WriteLine($"Service Bus connection string loaded: {serviceBusConnection.
 
 builder.Services.AddSingleton(_ => new ServiceBusClient(serviceBusConnection));
 
-// ── 6. JWT Auth ────────────────────────────────────────────────────────────────
+// JWT Auth
 var jwtSecret = builder.Configuration["inkwell-jwt-secret"]
     ?? throw new InvalidOperationException("JWT secret not found.");
 
@@ -78,14 +78,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// ── 7. DI Registrations ────────────────────────────────────────────────────────
+// DI Registrations
 builder.Services.AddScoped<ISubscriberRepository, SubscriberRepository>();
 builder.Services.AddScoped<INewsletterService, NewsletterServiceImpl>();
 
-// ── 8. Background Service (Service Bus Consumer) ───────────────────────────────
+// Background Service (Service Bus Consumer)
 builder.Services.AddHostedService<PostPublishedConsumer>();
 
-// ── 9. CORS ────────────────────────────────────────────────────────────────────
+// CORS
 builder.Services.AddCors(options =>
     options.AddPolicy("InkWellCors", policy =>
         policy.WithOrigins("http://localhost:4200")
@@ -95,7 +95,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
-// ── 10. Swagger ────────────────────────────────────────────────────────────────
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -131,7 +131,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// ── 11. Auto-migrate ───────────────────────────────────────────────────────────
+// Auto-migrate
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<NewsletterDbContext>();

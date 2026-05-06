@@ -11,9 +11,9 @@ public interface IPostService
     Task<IEnumerable<PostSummaryResponse>> GetPublishedPostsAsync();
     Task<IEnumerable<PostSummaryResponse>> SearchPostsAsync(string keyword);
     Task<PostResponse> UpdatePostAsync(Guid postId, Guid authorId, UpdatePostRequest request);
-    Task<PostResponse> PublishPostAsync(Guid postId, Guid authorId);
-    Task<PostResponse> UnpublishPostAsync(Guid postId, Guid authorId);
-    Task DeletePostAsync(Guid postId, Guid authorId);
+    Task<PostResponse> PublishPostAsync(Guid postId, Guid authorId, string userRole);
+    Task<PostResponse> UnpublishPostAsync(Guid postId, Guid authorId, string userRole);
+    Task DeletePostAsync(Guid postId, Guid authorId, string userRole);
     Task IncrementViewsAsync(Guid postId, string sessionId);
     Task LikePostAsync(Guid postId, Guid userId);
     Task UnlikePostAsync(Guid postId, Guid userId);

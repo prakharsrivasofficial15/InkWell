@@ -76,4 +76,18 @@ public class MediaRepository : IMediaRepository
 
     public async Task<int> CountByUploaderIdAsync(Guid uploaderId) =>
         await _db.MediaFiles.CountAsync(m => m.UploaderId == uploaderId);
+
+    // hard delete - permanently removes from database
+    public async Task HardDeleteAsync(Guid mediaId)
+    {
+        var media = await _db.MediaFiles
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(m => m.MediaId == mediaId);
+        
+        if (media is not null)
+        {
+            _db.MediaFiles.Remove(media);
+            await _db.SaveChangesAsync();
+        }
+    }
 }

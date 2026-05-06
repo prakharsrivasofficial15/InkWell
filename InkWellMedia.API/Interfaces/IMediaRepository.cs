@@ -12,4 +12,5 @@ public interface IMediaRepository : IBaseRepository<Media>
     Task<IEnumerable<Media>> GetAllMediaAsync();
     Task<IEnumerable<Media>> GetDeletedMediaAsync();
     Task<int> CountByUploaderIdAsync(Guid uploaderId);
+    Task HardDeleteAsync(Guid mediaId);
 }

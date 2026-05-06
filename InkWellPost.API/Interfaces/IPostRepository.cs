@@ -19,4 +19,8 @@ public interface IPostRepository : IBaseRepository<Post>
     Task<PostLike?> GetLikeAsync(Guid postId, Guid userId);
     Task AddLikeAsync(PostLike like);
     Task RemoveLikeAsync(PostLike like);
+    
+    // atomic likes count updates
+    Task IncrementLikesCountAsync(Guid postId);
+    Task DecrementLikesCountAsync(Guid postId);
 }

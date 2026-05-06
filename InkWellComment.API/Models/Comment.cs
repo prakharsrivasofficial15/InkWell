@@ -8,6 +8,7 @@ public class Comment : BaseEntity
 {
     public Guid CommentId { get; set; } = Guid.NewGuid();
     public Guid PostId { get; set; }
+    public Guid PostAuthorId { get; set; }    // who owns the post - for proper notification routing
     public Guid AuthorId { get; set; }
 
     // if it's null, then this is a top-level comment & if it has a value, then it's a reply to another comment

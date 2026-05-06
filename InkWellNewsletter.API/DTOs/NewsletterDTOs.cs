@@ -1,6 +1,6 @@
 namespace InkWellNewsletter.API.DTOs;
 
-// ── Requests ──────────────────────────────────────────────────────────────────
+// Requests
 
 public record SubscribeRequest(
     string Email,
@@ -19,7 +19,7 @@ public record UpdatePreferencesRequest(
     string Preferences
 );
 
-// ── Responses ─────────────────────────────────────────────────────────────────
+// Responses
 
 public record SubscriberResponse(
     Guid SubscriberId,

@@ -171,7 +171,7 @@ public class CategoryServiceImpl : ICategoryService
         if (tag is not null)
         {
             tag.PostCount++;
-            await _categoryRepo.AddTagAsync(tag);
+            await _categoryRepo.UpdateTagAsync(tag);
         }
     }
 
@@ -184,7 +184,7 @@ public class CategoryServiceImpl : ICategoryService
         if (tag is not null && tag.PostCount > 0)
         {
             tag.PostCount--;
-            await _categoryRepo.AddTagAsync(tag);
+            await _categoryRepo.UpdateTagAsync(tag);
         }
     }
 
@@ -228,14 +228,25 @@ public class CategoryServiceImpl : ICategoryService
             .Replace(".", "-")
             .Replace("/", "-");
 
-    // builds full category response with nested children
-    private async Task<CategoryResponse> ToCategoryResponseAsync(Category c)
+    // builds full category response with nested children, guarded against cycles
+    private async Task<CategoryResponse> ToCategoryResponseAsync(Category c, HashSet<Guid>? visited = null)
     {
+        visited ??= new HashSet<Guid>();
+        if (!visited.Add(c.CategoryId))
+        {
+            // cycle detected: return node without fetching its children again
+            return new CategoryResponse(
+                c.CategoryId, c.Name, c.Slug, c.Description,
+                c.ParentCategoryId, c.PostCount, c.CreatedAt, null);
+        }
+
         var children = await _categoryRepo.GetChildCategoriesAsync(c.CategoryId);
         var childResponses = new List<CategoryResponse>();
 
         foreach (var child in children)
-            childResponses.Add(await ToCategoryResponseAsync(child));
+            childResponses.Add(await ToCategoryResponseAsync(child, visited));
+
+        visited.Remove(c.CategoryId);
 
         return new CategoryResponse(
             c.CategoryId, c.Name, c.Slug, c.Description,

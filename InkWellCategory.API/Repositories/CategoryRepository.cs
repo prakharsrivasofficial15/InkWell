@@ -81,6 +81,13 @@ public class CategoryRepository : ICategoryRepository
         return tag;
     }
 
+    public async Task<Tag> UpdateTagAsync(Tag tag)
+    {
+        _db.Tags.Update(tag);
+        await _db.SaveChangesAsync();
+        return tag;
+    }
+
     public async Task DeleteTagAsync(Guid tagId)
     {
         var tag = await GetTagByIdAsync(tagId);

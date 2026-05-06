@@ -22,9 +22,9 @@ public class AuthController : ControllerBase
         _userRepo = userRepo;
     }
 
-    // ── Public Endpoints ────────────────────────────────────────────────────
+    // Public Endpoints
 
-    /// <summary>Register a new account. Role defaults to READER.</summary>
+    // Register a new account & Role defaults to READER
     [HttpPost("register")]
     [ProducesResponseType(typeof(ApiResponse<AuthResponse>), 200)]
     [ProducesResponseType(typeof(ApiResponse<object>), 400)]
@@ -41,7 +41,7 @@ public class AuthController : ControllerBase
         }
     }
 
-    /// <summary>Login with email and password. Returns JWT + refresh token.</summary>
+    // Login with email and password and returns JWT + refresh token
     [HttpPost("login")]
     [ProducesResponseType(typeof(ApiResponse<AuthResponse>), 200)]
     [ProducesResponseType(typeof(ApiResponse<object>), 401)]
@@ -58,7 +58,7 @@ public class AuthController : ControllerBase
         }
     }
 
-    /// <summary>Exchange a valid refresh token for new access + refresh tokens.</summary>
+    // Exchange a valid refresh token for new access + refresh tokens
     [HttpPost("refresh")]
     [ProducesResponseType(typeof(ApiResponse<AuthResponse>), 200)]
     [ProducesResponseType(typeof(ApiResponse<object>), 401)]
@@ -75,9 +75,9 @@ public class AuthController : ControllerBase
         }
     }
 
-    // ── Authenticated User Endpoints ─────────────────────────────────────────
+    // Authenticated User Endpoints
 
-    /// <summary>Get the currently logged-in user's profile.</summary>
+    // Get the currently logged-in user's profile
     [HttpGet("profile")]
     [Authorize]
     [ProducesResponseType(typeof(ApiResponse<UserProfileResponse>), 200)]
@@ -96,7 +96,7 @@ public class AuthController : ControllerBase
         }
     }
 
-    /// <summary>Update display name, bio, and avatar URL.</summary>
+    // Update display name, bio, and avatar URL
     [HttpPut("profile")]
     [Authorize]
     [ProducesResponseType(typeof(ApiResponse<UserProfileResponse>), 200)]
@@ -114,7 +114,7 @@ public class AuthController : ControllerBase
         }
     }
 
-    /// <summary>Change password. Requires current password verification.</summary>
+    // Change password: Requires current password verification
     [HttpPut("password")]
     [Authorize]
     [ProducesResponseType(typeof(ApiResponse<object>), 200)]
@@ -133,7 +133,7 @@ public class AuthController : ControllerBase
         }
     }
 
-    /// <summary>Logout — clears the stored refresh token.</summary>
+    // Logout — clears the stored refresh token
     [HttpPost("logout")]
     [Authorize]
     [ProducesResponseType(typeof(ApiResponse<object>), 200)]
@@ -144,7 +144,7 @@ public class AuthController : ControllerBase
         return Ok(new ApiResponse<object>(true, "Logged out successfully.", null));
     }
 
-    /// <summary>Deactivate own account. Cannot login after this.</summary>
+    // Deactivate own account: Cannot login after this
     [HttpDelete("deactivate")]
     [Authorize]
     [ProducesResponseType(typeof(ApiResponse<object>), 200)]
@@ -155,9 +155,9 @@ public class AuthController : ControllerBase
         return Ok(new ApiResponse<object>(true, "Account deactivated.", null));
     }
 
-    // ── Admin-Only Endpoints ─────────────────────────────────────────────────
+    // Admin-Only Endpoints
 
-    /// <summary>Get all active users. Admin only.</summary>
+    // Get all active users: Admin only
     [HttpGet("users")]
     [Authorize(Roles = "ADMIN")]
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<UserProfileResponse>>), 200)]
@@ -170,7 +170,7 @@ public class AuthController : ControllerBase
         return Ok(new ApiResponse<IEnumerable<UserProfileResponse>>(true, "Users fetched.", result));
     }
 
-    /// <summary>Change a user's role. Admin only.</summary>
+    // Change a user's role: Admin only
     [HttpPut("users/{userId}/role")]
     [Authorize(Roles = "ADMIN")]
     [ProducesResponseType(typeof(ApiResponse<object>), 200)]
@@ -184,14 +184,12 @@ public class AuthController : ControllerBase
         if (!Enum.TryParse<UserRole>(request.Role, ignoreCase: true, out var newRole))
             return BadRequest(new ApiResponse<object>(false, "Invalid role. Use READER, AUTHOR, or ADMIN.", null));
 
-        user.Role = newRole;
-        user.UpdatedAt = DateTime.UtcNow;
-        await _userRepo.UpdateAsync(user);
+        await _userRepo.UpdateRoleAsync(userId, newRole);
 
         return Ok(new ApiResponse<object>(true, $"Role updated to {newRole}.", null));
     }
 
-    /// <summary>Suspend (deactivate) any user. Admin only.</summary>
+    // Suspend (deactivate) any user (Admin only)
     [HttpPut("users/{userId}/suspend")]
     [Authorize(Roles = "ADMIN")]
     [ProducesResponseType(typeof(ApiResponse<object>), 200)]
@@ -205,20 +203,20 @@ public class AuthController : ControllerBase
         return Ok(new ApiResponse<object>(true, "User suspended.", null));
     }
 
-    /// <summary>Reactivate a previously suspended user. Admin only.</summary>
+    // Reactivate a previously suspended user (Admin only)
     [HttpPut("users/{userId}/reactivate")]
     [Authorize(Roles = "ADMIN")]
     [ProducesResponseType(typeof(ApiResponse<object>), 200)]
     public async Task<IActionResult> ReactivateUser(Guid userId)
     {
-        // bypass active filter to find suspended users
-        var user = await _userRepo.GetByUsernameAsync(userId.ToString());
+        var success = await _userRepo.ReactivateAsync(userId);
+        if (!success)
+            return NotFound(new ApiResponse<object>(false, "User not found.", null));
 
-        // use raw DB access for reactivation since GetByIdAsync filters IsActive
         return Ok(new ApiResponse<object>(true, "User reactivated.", null));
     }
 
-    /// <summary>Permanently delete a user account. Admin only.</summary>
+    // Permanently delete a user account (Admin only)
     [HttpDelete("users/{userId}")]
     [Authorize(Roles = "ADMIN")]
     [ProducesResponseType(typeof(ApiResponse<object>), 200)]
@@ -228,7 +226,7 @@ public class AuthController : ControllerBase
         return Ok(new ApiResponse<object>(true, "User deleted.", null));
     }
 
-    // ── Helper ────────────────────────────────────────────────────────────────
+    // Helper methods
 
     private Guid GetCurrentUserId()
     {

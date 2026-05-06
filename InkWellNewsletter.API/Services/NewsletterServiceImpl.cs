@@ -23,7 +23,7 @@ public class NewsletterServiceImpl : INewsletterService
         _config         = config;
     }
 
-    // ── Subscription Lifecycle ────────────────────────────────────────────────
+    // Subscription Lifecycle
 
     public async Task<SubscriberResponse> SubscribeAsync(SubscribeRequest request)
     {
@@ -128,7 +128,7 @@ public class NewsletterServiceImpl : INewsletterService
         await _subscriberRepo.UpdateAsync(subscriber);
     }
 
-    // ── Email Dispatch ────────────────────────────────────────────────────────
+    // Email Dispatch
 
     public async Task<CampaignResponse> SendNewsletterAsync(
         Guid adminId, SendNewsletterRequest request)
@@ -160,19 +160,29 @@ public class NewsletterServiceImpl : INewsletterService
 
         try
         {
-            // send to each subscriber with unsubscribe link
-            foreach (var subscriber in recipientList)
+            // send to each subscriber concurrently with a limit
+            using var semaphore = new SemaphoreSlim(20);
+            var tasks = recipientList.Select(async subscriber =>
             {
-                var unsubscribeLink = BuildUnsubscribeLink(subscriber.Token);
-                var htmlWithFooter  = AddUnsubscribeFooter(
-                    request.HtmlContent, unsubscribeLink);
+                await semaphore.WaitAsync();
+                try
+                {
+                    var unsubscribeLink = BuildUnsubscribeLink(subscriber.Token);
+                    var htmlWithFooter  = AddUnsubscribeFooter(
+                        request.HtmlContent, unsubscribeLink);
 
-                await SendEmailAsync(
-                    subscriber.Email,
-                    subscriber.FullName,
-                    request.Subject,
-                    htmlWithFooter);
-            }
+                    await SendEmailAsync(
+                        subscriber.Email,
+                        subscriber.FullName,
+                        request.Subject,
+                        htmlWithFooter);
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            });
+            await Task.WhenAll(tasks);
 
             campaign.Status = CampaignStatus.SENT;
             campaign.SentAt = DateTime.UtcNow;
@@ -202,13 +212,23 @@ public class NewsletterServiceImpl : INewsletterService
                text-decoration:none;border-radius:5px;">Read Now</a>
             """;
 
-        foreach (var subscriber in subscribers)
+        using var semaphore = new SemaphoreSlim(20);
+        var tasks = subscribers.Select(async subscriber =>
         {
-            var unsubscribeLink  = BuildUnsubscribeLink(subscriber.Token);
-            var htmlWithFooter   = AddUnsubscribeFooter(htmlBody, unsubscribeLink);
-            await SendEmailAsync(
-                subscriber.Email, subscriber.FullName, subject, htmlWithFooter);
-        }
+            await semaphore.WaitAsync();
+            try
+            {
+                var unsubscribeLink  = BuildUnsubscribeLink(subscriber.Token);
+                var htmlWithFooter   = AddUnsubscribeFooter(htmlBody, unsubscribeLink);
+                await SendEmailAsync(
+                    subscriber.Email, subscriber.FullName, subject, htmlWithFooter);
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        });
+        await Task.WhenAll(tasks);
     }
 
     public async Task SendWelcomeEmailAsync(string email, string fullName)
@@ -242,7 +262,7 @@ public class NewsletterServiceImpl : INewsletterService
         await SendEmailAsync(email, fullName, subject, htmlBody);
     }
 
-    // ── Private Helpers ───────────────────────────────────────────────────────
+    // Private Helpers
 
     private async Task SendEmailAsync(
         string toEmail, string toName, string subject, string htmlBody)
@@ -264,7 +284,7 @@ public class NewsletterServiceImpl : INewsletterService
         try
         {
             await _emailClient.SendAsync(
-                Azure.WaitUntil.Started, emailMessage);
+                Azure.WaitUntil.Completed, emailMessage);
         }
         catch (Exception ex)
         {
@@ -273,11 +293,17 @@ public class NewsletterServiceImpl : INewsletterService
         }
     }
 
-    private string BuildConfirmationLink(string token) =>
-        $"http://localhost:5006/api/newsletter/confirm?token={token}";
+    private string BuildConfirmationLink(string token)
+    {
+        var baseUrl = _config["inkwell-base-url"] ?? "http://localhost:5152";
+        return $"{baseUrl}/api/newsletter/confirm?token={token}";
+    }
 
-    private string BuildUnsubscribeLink(string token) =>
-        $"http://localhost:5006/api/newsletter/unsubscribe?token={token}";
+    private string BuildUnsubscribeLink(string token)
+    {
+        var baseUrl = _config["inkwell-base-url"] ?? "http://localhost:5152";
+        return $"{baseUrl}/api/newsletter/unsubscribe?token={token}";
+    }
 
     private static string AddUnsubscribeFooter(string html, string unsubscribeLink) =>
         html + $"""

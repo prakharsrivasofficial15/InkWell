@@ -12,7 +12,7 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── 1. Azure Key Vault ───────────────────────────────────────────────────────
+// Azure Key Vault
 // Load Key Vault URI from appsettings, then pull all secrets from vault
 var keyVaultUri = builder.Configuration["KeyVaultUri"]
     ?? throw new InvalidOperationException("KeyVaultUri not configured.");
@@ -21,17 +21,17 @@ builder.Configuration.AddAzureKeyVault(
     new Uri(keyVaultUri),
     new DefaultAzureCredential());
 
-// ── 2. Azure Application Insights ───────────────────────────────────────────
+// Azure Application Insights
 builder.Services.AddApplicationInsightsTelemetry(options =>
 {
     options.ConnectionString = builder.Configuration["inkwell-appinsights-connection"];
 });
 
-// ── 3. EF Core → Azure SQL ───────────────────────────────────────────────────
+// EF Core → Azure SQL
 builder.Services.AddDbContext<AuthDbContext>(opts =>
     opts.UseSqlServer(builder.Configuration["inkwell-sql-connection"]));
 
-// ── 4. JWT Settings ──────────────────────────────────────────────────────────
+// JWT Settings
 builder.Services.Configure<JwtSettings>(options =>
 {
     options.Secret    = builder.Configuration["inkwell-jwt-secret"]!;
@@ -43,7 +43,7 @@ builder.Services.Configure<JwtSettings>(options =>
         builder.Configuration["JwtSettings:RefreshTokenExpiryDays"] ?? "7");
 });
 
-// ── 5. JWT Authentication ────────────────────────────────────────────────────
+// JWT Authentication
 var jwtSecret = builder.Configuration["inkwell-jwt-secret"]
     ?? throw new InvalidOperationException("JWT secret not found in Key Vault.");
 
@@ -63,11 +63,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// ── 6. DI Registrations ──────────────────────────────────────────────────────
+// DI Registrations
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthServiceImpl>();
 
-// ── 7. CORS (for Angular frontend) ───────────────────────────────────────────
+// CORS (for Angular frontend)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("InkWellCors", policy =>
@@ -79,7 +79,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
-// ── 8. Swagger ───────────────────────────────────────────────────────────────
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -117,7 +117,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// ── 9. Auto-apply EF migrations on startup ───────────────────────────────────
+// Auto-apply EF migrations on startup
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AuthDbContext>();

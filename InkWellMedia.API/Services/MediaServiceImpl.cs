@@ -1,5 +1,6 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using InkWellMedia.API.DTOs;
 using InkWellMedia.API.Interfaces;
 using InkWellMedia.API.Models;
@@ -157,10 +158,15 @@ public class MediaServiceImpl : IMediaService
                 .GetBlobContainerClient(_containerName);
             var blobClient = containerClient.GetBlobClient(media.Filename);
             await blobClient.DeleteIfExistsAsync();
+
+            // hard delete from database after successful blob removal
+            await _mediaRepo.HardDeleteAsync(media.MediaId);
         }
     }
 
     // Private Helpers for internal use only 
+
+    // Note: Container is set to PublicAccessType.Blob since blog images need to be publicly accessible for display in posts. If private access is required, switch to PublicAccessType.None and implement SAS URL generation.
 
     private async Task<Media> GetOwnedMediaAsync(Guid mediaId, Guid uploaderId)
     {

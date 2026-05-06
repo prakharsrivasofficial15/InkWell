@@ -4,6 +4,7 @@ namespace InkWellComment.API.DTOs;
 
 public record AddCommentRequest(
     Guid PostId,
+    Guid PostAuthorId,        // who owns the post - for proper notification routing
     string Content,
     Guid? ParentCommentId  // null = top-level, Guid = reply
 );

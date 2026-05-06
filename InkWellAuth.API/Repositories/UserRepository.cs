@@ -93,6 +93,28 @@ public class UserRepository : IUserRepository
         await _db.SaveChangesAsync();
     }
 
+    // reactivates a suspended account
+    public async Task<bool> ReactivateAsync(Guid userId)
+    {
+        var target = await _db.Users.FirstOrDefaultAsync(u => u.UserId == userId && !u.IsDeleted);
+        if (target is null) return false;
+
+        target.IsActive = true;
+        target.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    // optimized targeted update for changing user role
+    public async Task UpdateRoleAsync(Guid userId, UserRole newRole)
+    {
+        await _db.Users
+            .Where(u => u.UserId == userId)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(u => u.Role, newRole)
+                .SetProperty(u => u.UpdatedAt, DateTime.UtcNow));
+    }
+
     // both conditions needed - not deleted and actively enabled
     public async Task<IEnumerable<User>> GetActiveUsersAsync() =>
         await _db.Users

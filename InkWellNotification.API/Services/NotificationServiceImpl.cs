@@ -1,25 +1,20 @@
-using Azure.Communication.Email;
 using InkWellNotification.API.DTOs;
 using InkWellNotification.API.Events;
 using InkWellNotification.API.Interfaces;
 using InkWellNotification.API.Models;
-using InkWellNotification.API.Events;
 
 namespace InkWellNotification.API.Services;
 
 public class NotificationServiceImpl : INotificationService
 {
     private readonly INotificationRepository _notifRepo;
-    private readonly EmailClient _emailClient;
     private readonly IConfiguration _config;
 
     public NotificationServiceImpl(
         INotificationRepository notifRepo,
-        EmailClient emailClient,
         IConfiguration config)
     {
         _notifRepo = notifRepo;
-        _emailClient = emailClient;
         _config = config;
     }
 
@@ -109,7 +104,7 @@ public class NotificationServiceImpl : INotificationService
         {
             await _notifRepo.AddAsync(new Notification
             {
-                RecipientId = commentEvent.AuthorId,
+                RecipientId = commentEvent.PostAuthorId,
                 ActorId = commentEvent.AuthorId,
                 Type = NotificationType.NEW_COMMENT,
                 Title = "New comment on your post",
@@ -123,7 +118,7 @@ public class NotificationServiceImpl : INotificationService
             // Case 2: Reply to comment → notify the parent commenter
             await _notifRepo.AddAsync(new Notification
             {
-                RecipientId = commentEvent.AuthorId,
+                RecipientId = commentEvent.ParentCommentAuthorId ?? commentEvent.PostAuthorId,
                 ActorId = commentEvent.AuthorId,
                 Type = NotificationType.COMMENT_REPLY,
                 Title = "Someone replied to your comment",

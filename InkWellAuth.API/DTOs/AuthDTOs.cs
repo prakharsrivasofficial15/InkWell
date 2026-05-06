@@ -1,6 +1,6 @@
 namespace InkWellAuth.API.DTOs;
 
-// ── Requests ────────────────────────────────────────────────────────────────
+// Requests
 
 public record RegisterRequest(
     string Username,
@@ -33,7 +33,7 @@ public record ChangeUserRoleRequest(
     string Role   // "READER", "AUTHOR", "ADMIN"
 );
 
-// ── Responses ───────────────────────────────────────────────────────────────
+// Responses
 
 public record AuthResponse(
     string AccessToken,

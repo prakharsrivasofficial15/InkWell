@@ -38,12 +38,12 @@ public class PostController : ControllerBase
     {
         try
         {
+            var post = await _postService.GetPostBySlugAsync(slug);
+            
             // increment view count using session cookie
             var sessionId = HttpContext.Session.Id;
-            await _postService.IncrementViewsAsync(
-                (await _postService.GetPostBySlugAsync(slug)).PostId, sessionId);
-
-            var post = await _postService.GetPostBySlugAsync(slug);
+            await _postService.IncrementViewsAsync(post.PostId, sessionId);
+            
             return Ok(new ApiResponse<PostResponse>(true, "Post fetched.", post));
         }
         catch (KeyNotFoundException ex)
@@ -125,7 +125,8 @@ public class PostController : ControllerBase
         try
         {
             var authorId = GetCurrentUserId();
-            var post = await _postService.PublishPostAsync(postId, authorId);
+            var userRole = User.FindFirstValue(ClaimTypes.Role) ?? "AUTHOR";
+            var post = await _postService.PublishPostAsync(postId, authorId, userRole);
             return Ok(new ApiResponse<PostResponse>(true, "Post published.", post));
         }
         catch (UnauthorizedAccessException)
@@ -147,7 +148,8 @@ public class PostController : ControllerBase
         try
         {
             var authorId = GetCurrentUserId();
-            var post = await _postService.UnpublishPostAsync(postId, authorId);
+            var userRole = User.FindFirstValue(ClaimTypes.Role) ?? "AUTHOR";
+            var post = await _postService.UnpublishPostAsync(postId, authorId, userRole);
             return Ok(new ApiResponse<PostResponse>(true, "Post unpublished.", post));
         }
         catch (UnauthorizedAccessException)
@@ -165,7 +167,8 @@ public class PostController : ControllerBase
         try
         {
             var authorId = GetCurrentUserId();
-            await _postService.DeletePostAsync(postId, authorId);
+            var userRole = User.FindFirstValue(ClaimTypes.Role) ?? "AUTHOR";
+            await _postService.DeletePostAsync(postId, authorId, userRole);
             return Ok(new ApiResponse<object>(true, "Post deleted.", null));
         }
         catch (UnauthorizedAccessException)

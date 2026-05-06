@@ -1,5 +1,6 @@
 using System.Text;
 using Azure.Identity;
+using Azure.Messaging.ServiceBus;
 using InkWellPost.API.Data;
 using InkWellPost.API.Interfaces;
 using InkWellPost.API.Repositories;
@@ -28,18 +29,21 @@ builder.Services.AddApplicationInsightsTelemetry(options =>
 //EF Core → Azure SQL
 builder.Services.AddDbContext<PostDbContext>(opts =>
     opts.UseSqlServer(builder.Configuration["inkwell-sql-connection"]));
-// builder.Services.AddDbContext<PostDbContext>(opts =>
-//     opts.UseSqlServer(
-//         builder.Configuration["inkwell-sql-connection"],
-//         sqlOptions => sqlOptions.EnableRetryOnFailure(
-//             maxRetryCount: 3,
-//             maxRetryDelay: TimeSpan.FromSeconds(10),
-//             errorNumbersToAdd: null)));
 
 //Azure Redis Cache
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
-    ConnectionMultiplexer.Connect(
-        builder.Configuration["inkwell-redis-connection"]!));
+{
+    var config = ConfigurationOptions.Parse(
+        builder.Configuration["inkwell-redis-connection"]!);
+    config.ConnectTimeout = 5000;
+    config.SyncTimeout    = 5000;
+    config.AbortOnConnectFail = false; // don't crash if Redis is unavailable
+    return ConnectionMultiplexer.Connect(config);
+});
+
+// Azure Service Bus
+builder.Services.AddSingleton(_ =>
+    new ServiceBusClient(builder.Configuration["inkwell-servicebus-connection"]));
 
 //JWT Auth (same secret as auth-service)
 var jwtSecret = builder.Configuration["inkwell-jwt-secret"]

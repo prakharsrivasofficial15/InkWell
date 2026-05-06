@@ -10,9 +10,9 @@ public abstract class BaseEntity
     // track when record was first created, always utc
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    // nullable because new records wont have an update yet
+    // nullable because new records won't have an update yet
     public DateTime? UpdatedAt { get; set; }
 
-    // soft delete flag - we never hard delete records
+    // soft delete flag: we never hard delete records
     public bool IsDeleted { get; set; } = false;
 }

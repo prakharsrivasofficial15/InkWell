@@ -26,6 +26,12 @@ public interface IUserRepository : IBaseRepository<User>
     // sets IsActive = false without deleting the record
     Task DeactivateAsync(Guid userId);
 
+    // reactivates a suspended account
+    Task<bool> ReactivateAsync(Guid userId);
+
+    // optimized targeted update for changing user role
+    Task UpdateRoleAsync(Guid userId, UserRole newRole);
+
     // admin use - get all non-deleted active users
     Task<IEnumerable<User>> GetActiveUsersAsync();
 }

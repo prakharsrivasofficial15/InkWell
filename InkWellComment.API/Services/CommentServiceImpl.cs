@@ -39,6 +39,7 @@ public class CommentServiceImpl : ICommentService
         var comment = new Comment
         {
             PostId          = request.PostId,
+            PostAuthorId    = request.PostAuthorId,
             AuthorId        = authorId,
             ParentCommentId = request.ParentCommentId,
             Content         = request.Content,
@@ -48,7 +49,14 @@ public class CommentServiceImpl : ICommentService
         await _commentRepo.AddAsync(comment);
 
         // publishes events to Azure Service Bus
-        await PublishCommentAddedEventAsync(comment);
+        Guid? parentCommentAuthorId = null;
+        if (comment.ParentCommentId.HasValue)
+        {
+            var parent = await _commentRepo.GetByCommentIdAsync(comment.ParentCommentId.Value);
+            parentCommentAuthorId = parent?.AuthorId;
+        }
+
+        await PublishCommentAddedEventAsync(comment, parentCommentAuthorId);
 
         return ToCommentResponse(comment, null);
     }
@@ -166,7 +174,7 @@ public class CommentServiceImpl : ICommentService
         return comment;
     }
 
-    private async Task PublishCommentAddedEventAsync(Comment comment)
+    private async Task PublishCommentAddedEventAsync(Comment comment, Guid? parentCommentAuthorId)
     {
         try
         {
@@ -175,7 +183,9 @@ public class CommentServiceImpl : ICommentService
                 comment.CommentId,
                 comment.PostId,
                 comment.AuthorId,
+                comment.PostAuthorId,         // now correct
                 comment.ParentCommentId,
+                parentCommentAuthorId,
                 comment.Content,
                 comment.CreatedAt);
 

@@ -1,6 +1,5 @@
 using InkWellNotification.API.DTOs;
 using InkWellNotification.API.Events;
-using InkWellNotification.API.Events;
 
 namespace InkWellNotification.API.Interfaces;
 

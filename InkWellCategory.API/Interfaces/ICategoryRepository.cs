@@ -16,6 +16,7 @@ public interface ICategoryRepository : IBaseRepository<Category>
     Task<Tag?> GetTagBySlugAsync(string slug);
     Task<IEnumerable<Tag>> GetAllTagsAsync();
     Task<Tag> AddTagAsync(Tag tag);
+    Task<Tag> UpdateTagAsync(Tag tag);
     Task DeleteTagAsync(Guid tagId);
     Task<bool> TagSlugExistsAsync(string slug);
     Task<IEnumerable<Tag>> GetTrendingTagsAsync(int count);

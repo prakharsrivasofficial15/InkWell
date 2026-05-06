@@ -5,8 +5,7 @@ using System.Text.Json;
 
 namespace InkWellNewsletter.API.BackgroundServices;
 
-// listens to Azure Service Bus for post.published events
-// when post-service publishes a post, this sends emails to all subscribers
+// listens to Azure Service Bus for post.published events when post-service publishes a post, this sends emails to all subscribers
 public class PostPublishedConsumer : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;

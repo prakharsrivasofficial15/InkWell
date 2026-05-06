@@ -5,7 +5,9 @@ public record CommentAddedEvent(
     Guid CommentId,
     Guid PostId,
     Guid AuthorId,
+    Guid PostAuthorId,     // who wrote the post (for new comment notifications)
     Guid? ParentCommentId,  // if this is a reply, we'll notify the parent commenter
+    Guid? ParentCommentAuthorId, // who wrote the parent comment (for reply notifications)
     string Content,
     DateTime CreatedAt
 );
