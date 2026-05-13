@@ -2,6 +2,47 @@
 ## Then add InkWell-specific entries:
 
 # ============================================
+# Standard .NET Build Artifacts
+# ============================================
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.pdb
+*.aps
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# ============================================
+# Visual Studio Files
+# ============================================
+.vs/
+*.vsidx
+*.metaproj
+*.metaproj.tmp
+*.profdata
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# ============================================
+# Test Results
+# ============================================
+TestResults/
+[Tt]est[Rr]esult*
+*.trx
+*.coverage
+*.coveragexml
+
+# ============================================
 # InkWell Project Specific
 # ============================================
 
@@ -77,4 +118,10 @@ __queuestorage__
 **/azureauth.json
 **/.env
 **/*.crt
-**/*.key
+**/*.keybin/ 
+
+# ============================================
+# Deployment Artifacts
+# ============================================
+publish/
+*.zip
