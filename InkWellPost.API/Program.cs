@@ -85,9 +85,13 @@ builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostService, PostServiceImpl>();
 
 //CORS
+var allowedOrigins = builder.Configuration["AllowedCorsOrigins"]?
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    ?? new[] { "http://localhost:4200" };
+
 builder.Services.AddCors(options =>
     options.AddPolicy("InkWellCors", policy =>
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()));
 
