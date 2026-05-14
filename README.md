@@ -11,12 +11,12 @@ Explore the live Swagger documentation for each microservice:
 | Service | Swagger UI Link |
 | :--- | :--- |
 | **Auth API** | [https://inkwell-auth-api.azurewebsites.net](https://inkwell-auth-api.azurewebsites.net) |
-| **Post API** | [https://inkwell-post-api.azurewebsites.net/swagger](https://inkwell-post-api.azurewebsites.net/swagger) |
-| **Category API** | [https://inkwell-category-api.azurewebsites.net/swagger](https://inkwell-category-api.azurewebsites.net/swagger) |
-| **Comment API** | [https://inkwell-comment-api.azurewebsites.net/swagger](https://inkwell-comment-api.azurewebsites.net/swagger) |
-| **Media API** | [https://inkwell-media-api.azurewebsites.net/swagger](https://inkwell-media-api.azurewebsites.net/swagger) |
-| **Newsletter API** | [https://inkwell-newsletter-api.azurewebsites.net/swagger](https://inkwell-newsletter-api.azurewebsites.net/swagger) |
-| **Notification API** | [https://inkwell-notification-api.azurewebsites.net/swagger](https://inkwell-notification-api.azurewebsites.net/swagger) |
+| **Post API** | [https://inkwell-post-api.azurewebsites.net](https://inkwell-post-api.azurewebsites.net) |
+| **Category API** | [https://inkwell-category-api.azurewebsites.net](https://inkwell-category-api.azurewebsites.net) |
+| **Comment API** | [https://inkwell-comment-api.azurewebsites.net](https://inkwell-comment-api.azurewebsites.net) |
+| **Media API** | [https://inkwell-media-api.azurewebsites.net](https://inkwell-media-api.azurewebsites.net) |
+| **Newsletter API** | [https://inkwell-newsletter-api.azurewebsites.net](https://inkwell-newsletter-api.azurewebsites.net) |
+| **Notification API** | [https://inkwell-notification-api.azurewebsites.net](https://inkwell-notification-api.azurewebsites.net) |
 
 ---
 
